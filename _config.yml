@@ -1,0 +1,66 @@
+# Configurations
+markdown: kramdown
+markdown_ext:  markdown,mkdown,mkdn,mkd,md
+#highlighter: pygments
+
+# Permalinks
+permalink:        /blog/:year/:month/:day/:title
+
+# Setup
+title:            'blog.mahlberg.io'
+tagline:          'All the good things!'
+description:      'A Sample blog using Jekyll Metro'
+url:              'http://127.0.0.1:4000'
+baseurl:          ''
+gems: [jekyll-paginate]
+
+# Navigation
+navigation:
+- text: About
+  url: /about/
+- text: Resume
+  url: /resume/
+- text: Blog
+  url: /blog/
+- text: Tags
+  url: /tags/
+- text: Archive
+  url : /archive/
+- text: Search
+  url: /search/
+
+
+# Author Details
+author:         'Markus W Mahlberg'
+
+#Social Media links (Use complete URL except for email)
+dribbble:
+email:          'markus@mahlberg.io'
+facebook:       'https://www.facebook.com/mwmahlberg'
+flickr:
+github:         'https://github.com/mwmahlberg'
+gplus:          'https://plus.google.com/u/0/+MarkusMahlberg/' 
+#instagram:
+#pinterest:
+#linkedin:       'https://ae.linkedin.com/in/olakara/'
+linkedin:       'https://de.linkedin.com/in/mwmahlberg'
+#rss:
+stackoverflow:  'http://stackoverflow.com/users/1296707/markus-w-mahlberg'
+twitter:        'https://twitter.com/mwmahlberg'
+
+# Google Analytics
+gahandler: 'UA-52149651-1'
+
+#if footersvg is 'true' the social media links will be shown top on the copy right in the footer
+footersvg: 'true'
+
+# Disqus
+disqushandler: 'blogmahlbergio'
+
+# Blog Configurations
+paginate: 10 # Posts per page on the blog index
+paginate_path: '/blog/page:num'
+destination: ./_site
+
+# Custom vars
+version:          0.9x beta 2
