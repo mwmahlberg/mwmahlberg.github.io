@@ -10,7 +10,7 @@ permalink:        /blog/:year/:month/:day/:title
 title:            'blog.mahlberg.io'
 tagline:          'All the good things!'
 description:      'A Sample blog using Jekyll Metro'
-url:              'http://127.0.0.1:4000'
+url:              'http://blog.mahlberg.io'
 baseurl:          ''
 gems: [jekyll-paginate]
 
