@@ -1,8 +1,7 @@
 ---
 layout: post
-title: Data Modelling for MongoDB, Part 1
-subtitle: The problem with overembedding
-date: 2015-11-05 18:00:00
+title: Data Modelling for MongoDB, Part 1&colon;<br/> The problem with overembedding
+date: 2015-11-05 19:11:00
 categories: MongoDB Modelling Tutorial
 tags: MongoDB 
 excerpt_separator: <!--more-->
@@ -90,7 +89,7 @@ Please note that even in an optimal case, multiple tables and indices are involv
 
 Now, let's see how the document for John would look like:
 
-{% highlight JavaScript %}
+    {% highlight javascript %}
 {
   "_id": ObjectId("5637c2690a55d1434116a2f8"),
   "name": [
@@ -102,13 +101,14 @@ Now, let's see how the document for John would look like:
     { "type": "home", "number": "+1.234.98765" }
   ]
 }
-{% endhighlight %}
+
+    {% endhighlight %}
 
 To get all phone numbers of John, the query for mongodb would be quite simple:
 
-{% highlight JavaScript %}
-db.users.find({"name.first":"John","name.last":"Doe"})
-{% endhighlight %}
+    {% highlight JavaScript %}
+    db.users.find({"name.first":"John","name.last":"Doe"})
+    {% endhighlight %}
 
 With an index set on the `name` field, only the `users` collection is involved and only one index has to be searched.
 
@@ -135,10 +135,47 @@ Albeit 16 megabytes can hold a lot of `follows` entries and `chirps`, using the 
 
 Note: This applies only for [the mmapv1 storage engine][mongo:mmap] of MongoDB. But since [it is the default storage engine][mongo:defaultStorage] as of the time of this writing, I am going to adress it.
 
-MongoDB has a paradigm that documents are never fragmented, meaning that a document is always a contiguous stream of bytes in the datafiles. 
+MongoDB has a paradigm that documents are never fragmented, meaning that a document is always a contiguous stream of bytes in the datafiles.
+In order to prevent the need of migrating a document each time some bytes are added, MongoDB applies a padding to each document[^b], which is empty space which will be used when information is added to the document:
+
+![MongoDB padding]({{ site.url }}/assets/data-modelling-for-mongodb/padding.png)
+
+If this padding space is exhausted, the document will be migrated to a new place in the datafiles and new padding is allocated. This procedure is called "document migration" and it is a rather costly process – there is a reason why padding is added, the first place.
+
+Now, when embedded data is constantly added to documents, this problem gets more severe, since a lot of document migrations might happen in parallel, which can -- and at some point will -- cause performance performance degration.
+
+### The problem of complicated CRUD
+
+This problem coming with overembedding is a bit more subtle than the others. But it is rather easy to grasp when using deduction:
+
+1. The more complicated a model gets, the more complicated CRUD operations become.
+2. The more complicated CRUD operations become, the harder code becomes to develop and maintain.
+3. The harder code becomes to develop and maintain, the longer it needs.
+4. The longer development and maintenance needs, the more expensive it gets, be it monetary or time-wise (or both).
+5. All in all: The more complicated a model gets, the more expensive it gets, be it monetary or time-wise (or both).
+
+One could argue that a complicated data model might pay off in the long term, but this is in fact bound to certain conditions (see below).
+ 
+## Conclusion
+
+I hope I was able to show the problems overembedding brings with it. To put it a bit more positive: Embedding works if…
+
+* …we are talking of a One-To-(Very-)Few &trade; relationship, otherwise we'll hit the BSON size limit *AND*
+* …(updates are rather rare *OR* you are using WiredTiger as a storage engine) *AND*
+* …(embedding is kept rather simple and we are not talking of whole trees of subdocument arrays embedded *OR* those complicated models are made necessary by requirements other then technical)
+
+
+## Outlook
+
+In the next article of this series, I will show how to do the data modelling properly for a One-To-(Almost)-Infinite many relationship. Not only the actual data modelling itself, but how to approach it, since it is significantly different then the "SQL way".
+
+Please feel free to comment! I am eager to hear your opinion, corrections, questions (which I will try to answer) and suggestions. Also, the roadmap of this article series is not set in stone. If you want a specific matter to be discussed, do not hesitate to ask for it.
+
+hth
 
 <hr>
 [^a]: Yes, there are abstraction layers which can do this for you (as long as it does not get too complicated), and one could use (materialized) views, but that only puts the solving of those problems at another place or person – and possibly out of control.
+[^b]: Please see the [the MongoDB docs on 'Record Allocation Strategies'][mongo:recordAllocation] for details
 
 [so:mongodb]: http://stackoverflow.com/questions/tagged/mongodb "Questions tagged with 'mongodb' on stackoverflow.com"
 [wp:bson]: https://en.wikipedia.org/wiki/BSON "wikipedia article on BSON"
@@ -146,3 +183,4 @@ MongoDB has a paradigm that documents are never fragmented, meaning that a docum
 [mongo:bsonSize]: https://docs.mongodb.org/manual/reference/limits/#BSON-Document-Size "'BSON document size' in 'MongoDB Limits and Thresholds' – MongoDB documentation"
 [mongo:mmap]: https://docs.mongodb.org/manual/faq/storage/#mmapv1-storage-engine "'MMAPv1 Storage Engine' in 'FAQ: MongoDB Storage' – MongoDB documentation"
 [mongo:defaultStorage]: https://docs.mongodb.org/manual/faq/storage/#what-will-be-the-default-storage-engine-going-forward "'What will be the default storage engine going forward?' in 'FAQ: MongoDB Storage' – MongoDB documentation"
+[mongo:recordAllocation]: https://docs.mongodb.org/manual/core/mmapv1/#record-allocation-strategies "'Record Allocation Strategies' – MongoDB documentation"
