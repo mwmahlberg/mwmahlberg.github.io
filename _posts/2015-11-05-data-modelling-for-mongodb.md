@@ -142,7 +142,7 @@ In order to prevent the need of migrating a document each time some bytes are ad
 
 If this padding space is exhausted, the document will be migrated to a new place in the datafiles and new padding is allocated. This procedure is called "document migration" and it is a rather costly process – there is a reason why padding is added, the first place.
 
-Now, when embedded data is constantly added to documents, this problem gets more severe, since a lot of document migrations might happen in parallel, which can -- and at some point will -- cause performance performance degration.
+Now, when embedded data is constantly added to documents, this problem gets more severe, since a lot of document migrations might happen in parallel, which can -- and at some point will -- cause performance degration.
 
 ### The problem of complicated CRUD
 
