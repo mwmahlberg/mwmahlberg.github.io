@@ -167,7 +167,7 @@ I hope I was able to show the problems overembedding brings with it. To put it a
 
 ## Outlook
 
-In the next article of this series, I will show how to do the data modelling properly for a One-To-(Almost)-Infinite many relationship. Not only the actual data modelling itself, but how to approach it, since it is significantly different then the "SQL way".
+In the next article of this series, I will show how to do the data modelling properly for a One-To-(Almost)-Infinite-Many relationship. Not only the actual data modelling itself, but how to approach it, since it is significantly different than the "SQL way".
 
 Please feel free to comment! I am eager to hear your opinion, corrections, questions (which I will try to answer) and suggestions. Also, the roadmap of this article series is not set in stone. If you want a specific matter to be discussed, do not hesitate to ask for it.
 
