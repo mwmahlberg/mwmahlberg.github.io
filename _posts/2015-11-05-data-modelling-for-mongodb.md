@@ -7,6 +7,8 @@ tags: MongoDB
 excerpt_separator: <!--more-->
 ---
 
+<a href="https://twitter.com/share" class="twitter-share-button" data-via="mwmahlberg" data-size="large" data-count="none">Tweet</a> <script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0],p=/^http:/.test(d.location)?'http':'https';if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src=p+'://platform.twitter.com/widgets.js';fjs.parentNode.insertBefore(js,fjs);}}(document, 'script', 'twitter-wjs');</script>
+
 MongoDB is a fast, scalable, document oriented NoSQL database with flexible schemas and easy to set up failover capabilities.
 
 But like with any tool, you need to use it correctly so that it can keep up with those promises – the best hammer in the world will fail when used as a screwdriver. One of the most crucial parts here is a correct modelling for the individual use case. This series of blog posts will introduce you to the most common pitfalls and show you how to prevent them.
