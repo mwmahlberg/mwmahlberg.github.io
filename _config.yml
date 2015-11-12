@@ -33,6 +33,11 @@ navigation:
 # Author Details
 author:         'Markus W Mahlberg'
 
+# Mailhide
+mailhide:
+ k: '012X9odBERvvGgowCQBH2jmQ=='
+ c: 'KJMvzPEFJzWvpfyiR6rV4ICzkZbmvA0sHaovWr-ia3g='
+
 #Social Media links (Use complete URL except for email)
 dribbble:
 email:          'markus@mahlberg.io'
