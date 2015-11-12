@@ -1,6 +1,6 @@
 ---
 layout: post
-title: Data Modelling for MongoDB, Part 1&colon;<br/> The problem with overembedding
+title: Data Modelling for MongoDB, Part 1 – The problem with overembedding
 date: 2015-11-05 19:11:00
 categories: MongoDB Modelling Tutorial
 tags: MongoDB 
