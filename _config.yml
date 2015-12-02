@@ -9,7 +9,7 @@ permalink:        /blog/:year/:month/:day/:title
 # Setup
 title:            'blog.mahlberg.io'
 tagline:          'All the good things!'
-description:      'A Sample blog using Jekyll Metro'
+description:      'Markus W Mahlberg''s blog'
 url:              'http://blog.mahlberg.io'
 baseurl:          ''
 gems: [jekyll-paginate]
