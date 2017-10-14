@@ -1,8 +1,11 @@
 # Configurations
 markdown: kramdown
+kramdown:
+    input: GFM
 markdown_ext:  markdown,mkdown,mkdn,mkd,md
 #highlighter: pygments
-
+redcarpet:
+    extensions: ["no_intra_emphasis", "tables", "autolink", "strikethrough", "with_toc_data","prettify"]
 # Permalinks
 permalink:        /blog/:year/:month/:day/:title
 
@@ -10,9 +13,9 @@ permalink:        /blog/:year/:month/:day/:title
 title:            'blog.mahlberg.io'
 tagline:          'All the good things!'
 description:      'Markus W Mahlberg''s blog'
-url:              'http://blog.mahlberg.io'
+url:              'https://blog.mahlberg.io'
 baseurl:          ''
-gems: [jekyll-paginate]
+plugins: [jekyll-paginate]
 
 # Navigation
 navigation:
@@ -44,7 +47,7 @@ email:          'markus@mahlberg.io'
 facebook:       'https://www.facebook.com/mwmahlberg'
 flickr:
 github:         'https://github.com/mwmahlberg'
-gplus:          'https://plus.google.com/u/0/+MarkusMahlberg/' 
+gplus:          'https://plus.google.com/u/0/+MarkusMahlberg/'
 #instagram:
 #pinterest:
 #linkedin:       'https://ae.linkedin.com/in/olakara/'
