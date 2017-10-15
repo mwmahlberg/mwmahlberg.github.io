@@ -3,7 +3,8 @@ layout: post
 title: Data Modelling for MongoDB, Part 1 – The problem with overembedding
 date: 2015-11-05 19:11:00
 categories: MongoDB Modelling Tutorial
-tags: MongoDB 
+tags: MongoDB
+theme: emerald
 excerpt_separator: <!--more-->
 ---
 
@@ -128,8 +129,8 @@ Actually, the ["Chirper" example above](#embedded_chirps) shows one of the major
 With the data model above, Chirper is in big trouble now. Reason: as of the time of this writing [the according MongoDB documentation states][mongo:bsonSize] that
 
 > The maximum BSON document size is 16 megabytes.
-> 
->The maximum document size helps ensure that a single document cannot use excessive amount of RAM or, during transmission, excessive amount of bandwidth. 
+>
+>The maximum document size helps ensure that a single document cannot use excessive amount of RAM or, during transmission, excessive amount of bandwidth.
 
 Albeit 16 megabytes can hold a lot of `follows` entries and `chirps`, using the model shown above would artificially impose a limit on what a person can do just for the sake of comforting the developer. And we have not even started to think about answers, comments, votes, flags and alike.
 
@@ -157,7 +158,7 @@ This problem coming with overembedding is a bit more subtle than the others. But
 5. All in all: The more complicated a model gets, the more expensive it gets, be it monetary or time-wise (or both).
 
 One could argue that a complicated data model might pay off in the long term, but this is in fact bound to certain conditions (see below).
- 
+
 ## Conclusion
 
 I hope I was able to show the problems overembedding brings with it. To put it a bit more positive: Embedding works if…
