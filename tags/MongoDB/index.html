@@ -2,7 +2,7 @@
 layout: page
 title: Tags - SharePoint
 description: All articles with SharePoint tag assigned
-theme: red
+theme: green
 ---
     <div class="row">
         <div class="col-md-2">
@@ -29,11 +29,11 @@ theme: red
                 <ul>
                     {% for post in site.posts %}
                         {% for otag in post.tags %}
-                            {% if otag == 'SharePoint' %}
+                            {% if otag == 'MongoDB' %}
                                 <li class="alink"><a href="{{ post.url }}" class="red-link">{{ post.title }}</a></li>
                             {% endif %}
                         {% endfor %}
-                    {% endfor %}    
+                    {% endfor %}
                 </ul>
             </section>
         </div>
