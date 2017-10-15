@@ -14,8 +14,7 @@ title:            'blog.mahlberg.io'
 tagline:          'All the good things!'
 description:      'Markus W Mahlberg''s blog'
 url:              'https://blog.mahlberg.io'
-baseurl:          'https://blog.mahlberg.io'
-plugins: [jekyll-paginate]
+plugins:          [jekyll-paginate]
 
 # Navigation
 navigation:
