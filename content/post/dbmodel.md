@@ -118,7 +118,6 @@ We have seen that embedding wields quite some power when it comes to answering q
 
 Actually, the ["Chirper" example above](#embedded_chirps) shows one of the major problems with embedding. Let's assume Chirper is The Next Big Thing, totally takes off and has millions of users chirping all day.
 
-
 ### The document size problem
 
 With the data model above, Chirper is in big trouble now. Reason: as of the time of this writing [the according MongoDB documentation states][mongo:bsonSize] that
@@ -161,7 +160,6 @@ I hope I was able to show the problems overembedding brings with it. To put it a
 * …we are talking of a One-To-(Very-)Few &trade; relationship, otherwise we'll hit the BSON size limit *AND*
 * …(updates are rather rare *OR* you are using WiredTiger as a storage engine) *AND*
 * …(embedding is kept rather simple and we are not talking of whole trees of subdocument arrays embedded *OR* those complicated models are made necessary by requirements other then technical)
-
 
 ## Outlook
 
