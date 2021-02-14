@@ -1,0 +1,62 @@
+[[main]]
+  name = "Home"
+  url = ""
+  weight = -110
+
+# Submenus are done this way: parent -> identifier
+[[main]]
+  name = "Projects"
+  identifier = "Projects"
+  weight = -108
+[[main]]
+  parent = "Projects"
+  name = "Ansible Role for secure ssh"
+  url = "https://github.com/mwmahlberg/ansible-role-sssh"
+  weight = 1
+[[main]]
+  parent = "Projects"
+  name = "Velero Sentinel"
+  url = "https://velero-sentinel.mahlberg.io/"
+  weight = 2
+[[main]]
+  parent = "Projects"
+  name = "Snap"
+  url = "https://github.com/mwmahlberg/snap"
+  weight = 3
+
+[[main]]
+  name = "About"
+  url = "about/"
+  weight = -107
+
+# social menu links
+
+[[social]]
+  name = "github"
+  type = "social"
+  weight = 1
+  url = "https://github.com/mwmahlberg"
+[[social]]
+  name = "twitter"
+  weight = 2
+  url = "https://twitter.com/mwmahlberg"
+[[social]]
+  name = "stackoverflow"
+  weight = 3
+  url = "https://stackoverflow.com/users/1296707/markus-w-mahlberg"
+[[social]]
+  name = "rss"
+  weight = 4
+  url = "index.xml"
+
+# other supported social links
+# name = "youtube"
+# url = "https://www.youtube.com/#"
+# name = "facebook"
+# url = "https://facebook.com/#"
+# name = "instagram"
+# url = "https://instagram.com/#"
+# name = "stackoverflow"
+# url = "https://stackoverflow.com/#"
+# name = "gitlab"
+# url = "https://gitlab.com/#"
