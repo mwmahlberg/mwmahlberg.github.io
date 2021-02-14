@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Posts on blog.mahlberg.io</title><link>https://blog.mahlberg.io/post/</link><description>Recent content in Posts on blog.mahlberg.io</description><generator>Hugo -- gohugo.io</generator><copyright>Copyright © 2015–2021 Markus Mahlberg all rights reserved.</copyright><lastBuildDate>Thu, 05 Nov 2015 13:00:00 +0100</lastBuildDate><atom:link href="https://blog.mahlberg.io/post/index.xml" rel="self" type="application/rss+xml"/><item><title>Data Modelling for MongoDB, Part 1 – The problem with overembedding</title><link>https://blog.mahlberg.io/post/dbmodel/</link><pubDate>Thu, 05 Nov 2015 13:00:00 +0100</pubDate><guid>https://blog.mahlberg.io/post/dbmodel/</guid><description>
+&lt;p>MongoDB is a fast, scalable, document oriented NoSQL database with flexible schemas and easy to set up failover capabilities.&lt;/p>
+&lt;p>But like with any tool, you need to use it correctly so that it can keep up with those promises – the best hammer in the world will fail when used as a screwdriver.&lt;/p>
+&lt;p>One of the most crucial parts here is a correct modelling for the individual use case. This series of blog posts will introduce you to the most common pitfalls and show you how to prevent them.&lt;/p>
+&lt;h2 id="embedding">Embedding&lt;/h2>
+&lt;h3 id="what-is-embedding">What is embedding?&lt;/h3>
+&lt;p>For those of you who are new to MongoDB, let's first see what embedding means. As written, MongoDB is a document oriented database. Information is stored in a format called &lt;a href="https://en.wikipedia.org/wiki/BSON" title="wikipedia article on BSON">BSON&lt;/a>. The name's similarity to the well known &lt;a href="https://en.wikipedia.org/wiki/JSON" title="wikipedia article on JSON">JSON&lt;/a> format is not by accident – BSON stands for &amp;quot;Binary jSON&amp;quot;.&lt;/p>
+&lt;p>In its human readable form, a BSON document stored in MongoDB might look like this (prettified):&lt;/p>
+&lt;div class="highlight">&lt;pre class="chroma">&lt;code class="language-javascript" data-lang="javascript">&lt;span class="ln">1&lt;/span>&lt;span class="p">{&lt;/span>
+&lt;span class="ln">2&lt;/span> &lt;span class="s2">&amp;#34;_id&amp;#34;&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="nx">ObjectId&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s2">&amp;#34;5637933a0a55d1434116a2f7&amp;#34;&lt;/span>&lt;span class="p">),&lt;/span>
+&lt;span class="ln">3&lt;/span> &lt;span class="s2">&amp;#34;user&amp;#34;&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="s2">&amp;#34;mwmahlberg&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;span class="ln">4&lt;/span> &lt;span class="s2">&amp;#34;joined&amp;#34;&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="nx">ISODate&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s2">&amp;#34;2015-11-02T16:46:39.813Z&amp;#34;&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;span class="ln">5&lt;/span> &lt;span class="c1">// …
+&lt;/span>&lt;span class="ln">6&lt;/span>&lt;span class="c1">&lt;/span>&lt;span class="p">}&lt;/span>
+&lt;/code>&lt;/pre>&lt;/div>&lt;p>Now, let us assume we are modelling our data for a social media application we call &amp;quot;Chirper&amp;quot;, for my lack of fantasy and the sake of an easy grasp on the examples. Embedding allows us to store every &amp;quot;chirp&amp;quot; inside the document of a user:&lt;/p>
+&lt;div class="highlight">&lt;pre class="chroma">&lt;code class="language-javascript" data-lang="javascript">&lt;span class="ln"> 1&lt;/span>&lt;span class="p">{&lt;/span>
+&lt;span class="ln"> 2&lt;/span> &lt;span class="s2">&amp;#34;_id&amp;#34;&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="nx">ObjectId&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s2">&amp;#34;5637933a0a55d1434116a2f7&amp;#34;&lt;/span>&lt;span class="p">),&lt;/span>
+&lt;span class="ln"> 3&lt;/span> &lt;span class="s2">&amp;#34;user&amp;#34;&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="s2">&amp;#34;mwmahlberg&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;span class="ln"> 4&lt;/span> &lt;span class="s2">&amp;#34;joined&amp;#34;&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="nx">ISODate&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s2">&amp;#34;2015-11-02T16:46:39.813Z&amp;#34;&lt;/span>&lt;span class="p">),&lt;/span>
+&lt;span class="ln"> 5&lt;/span> &lt;span class="s2">&amp;#34;chirps&amp;#34;&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="p">[&lt;/span>
+&lt;span class="ln"> 6&lt;/span> &lt;span class="p">{&lt;/span>&lt;span class="nx">date&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="nx">ISODate&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s2">&amp;#34;2015-11-02T16:57:36.819Z&amp;#34;&lt;/span>&lt;span class="p">),&lt;/span> &lt;span class="nx">content&lt;/span>&lt;span class="o">:&lt;/span>&lt;span class="s2">&amp;#34;#Chirper rocks!&amp;#34;&lt;/span>&lt;span class="p">},&lt;/span>
+&lt;span class="ln"> 7&lt;/span> &lt;span class="p">{&lt;/span>&lt;span class="nx">date&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="nx">ISODate&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s2">&amp;#34;2015-11-02T16:59:21.453Z&amp;#34;&lt;/span>&lt;span class="p">),&lt;/span> &lt;span class="nx">content&lt;/span>&lt;span class="o">:&lt;/span>&lt;span class="s2">&amp;#34;@all I am a chirper, at last!&amp;#34;&lt;/span>&lt;span class="p">}&lt;/span>
+&lt;span class="ln"> 8&lt;/span> &lt;span class="p">],&lt;/span>
+&lt;span class="ln"> 9&lt;/span> &lt;span class="nx">follows&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="p">[&lt;/span>
+&lt;span class="ln">10&lt;/span> &lt;span class="nx">ObjectId&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s2">&amp;#34;5637c7140a55d1434116a2fa&amp;#34;&lt;/span>&lt;span class="p">),&lt;/span>
+&lt;span class="ln">11&lt;/span> &lt;span class="nx">ObjectId&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s2">&amp;#34;5637c7350a55d1434116a2fb&amp;#34;&lt;/span>&lt;span class="p">),&lt;/span>
+&lt;span class="ln">12&lt;/span> &lt;span class="nx">ObjectId&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s2">&amp;#34;5637c7350a55d1434116a2fc&amp;#34;&lt;/span>&lt;span class="p">),&lt;/span>
+&lt;span class="ln">13&lt;/span> &lt;span class="nx">ObjectId&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s2">&amp;#34;5637c7350a55d1434116a2fd&amp;#34;&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;span class="ln">14&lt;/span> &lt;span class="p">]&lt;/span>
+&lt;span class="ln">15&lt;/span>&lt;span class="p">}&lt;/span>
+&lt;span class="ln">16&lt;/span>
+&lt;/code>&lt;/pre>&lt;/div>&lt;p>To be more abstract:&lt;/p>
+&lt;blockquote>
+&lt;p>Embedding allows to store a valid BSON document inside another BSON document.&lt;/p>
+&lt;/blockquote>
+&lt;h3 id="why-would-one-use-embedding">Why would one use embedding?&lt;/h3>
+&lt;h4 id="the-sql-way">The SQL way&lt;/h4>
+&lt;p>Put plainly: Embedding can safe you additional or (more or less) complicated queries. Let us assume we have an SQL schema like this for storing multiple phone numbers for a contact:&lt;/p>
+&lt;p>&lt;img src="https://blog.mahlberg.io/images/data-modelling-for-mongodb/sql-model.png" alt="SQL phonebook model">&lt;/p>
+&lt;p>Now, in order to get all telephone numbers of John Doe, together with his full name, we have the following query:&lt;/p>
+&lt;div class="highlight">&lt;pre class="chroma">&lt;code class="language-sql" data-lang="sql">&lt;span class="ln">1&lt;/span>&lt;span class="k">SELECT&lt;/span> &lt;span class="n">u&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">first_name&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">u&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">last_name&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">p&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">phone&lt;/span>
+&lt;span class="ln">2&lt;/span>&lt;span class="k">FROM&lt;/span> &lt;span class="n">users&lt;/span> &lt;span class="n">u&lt;/span>
+&lt;span class="ln">3&lt;/span>&lt;span class="k">JOIN&lt;/span> &lt;span class="n">phone_numbers&lt;/span> &lt;span class="n">p&lt;/span> &lt;span class="k">ON&lt;/span> &lt;span class="n">p&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">user_id&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="n">u&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">id&lt;/span>
+&lt;span class="ln">4&lt;/span>&lt;span class="k">WHERE&lt;/span> &lt;span class="n">u&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">first_name&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s2">&amp;#34;John&amp;#34;&lt;/span> &lt;span class="k">AND&lt;/span> &lt;span class="n">u&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">last_name&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="s2">&amp;#34;Doe&amp;#34;&lt;/span>
+&lt;/code>&lt;/pre>&lt;/div>&lt;p>That is already pretty complicated, although this is a pretty simple example&lt;sup id="fnref:1">&lt;a href="#fn:1" class="footnote-ref" role="doc-noteref">1&lt;/a>&lt;/sup>. As we all know, complicated things are hard to maintain, and the more complicated something gets the longer it takes to develop. A hand axe is pretty easy to produce when compared to the ISS, for example.&lt;/p>
+&lt;p>Please note that even in an optimal case, multiple tables and indices are involved.&lt;/p>
+&lt;h4 id="the-mongodb-way-with-embedding">The MongoDB way with embedding&lt;/h4>
+&lt;p>Now, let's see how the document for John would look like:&lt;/p>
+&lt;div class="highlight">&lt;pre class="chroma">&lt;code class="language-javascript" data-lang="javascript">&lt;span class="ln"> 1&lt;/span>&lt;span class="p">{&lt;/span>
+&lt;span class="ln"> 2&lt;/span> &lt;span class="s2">&amp;#34;_id&amp;#34;&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="nx">ObjectId&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s2">&amp;#34;5637c2690a55d1434116a2f8&amp;#34;&lt;/span>&lt;span class="p">),&lt;/span>
+&lt;span class="ln"> 3&lt;/span> &lt;span class="s2">&amp;#34;name&amp;#34;&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="p">[&lt;/span>
+&lt;span class="ln"> 4&lt;/span> &lt;span class="p">{&lt;/span> &lt;span class="s2">&amp;#34;first&amp;#34;&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="s2">&amp;#34;John&amp;#34;&lt;/span> &lt;span class="p">},&lt;/span>
+&lt;span class="ln"> 5&lt;/span> &lt;span class="p">{&lt;/span> &lt;span class="s2">&amp;#34;last&amp;#34;&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="s2">&amp;#34;Doe&amp;#34;&lt;/span> &lt;span class="p">}&lt;/span>
+&lt;span class="ln"> 6&lt;/span> &lt;span class="p">],&lt;/span>
+&lt;span class="ln"> 7&lt;/span> &lt;span class="nx">phone&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="p">[&lt;/span>
+&lt;span class="ln"> 8&lt;/span> &lt;span class="p">{&lt;/span> &lt;span class="s2">&amp;#34;type&amp;#34;&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="s2">&amp;#34;work&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="s2">&amp;#34;number&amp;#34;&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="s2">&amp;#34;+1.234.56789&amp;#34;&lt;/span> &lt;span class="p">},&lt;/span>
+&lt;span class="ln"> 9&lt;/span> &lt;span class="p">{&lt;/span> &lt;span class="s2">&amp;#34;type&amp;#34;&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="s2">&amp;#34;home&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="s2">&amp;#34;number&amp;#34;&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="s2">&amp;#34;+1.234.98765&amp;#34;&lt;/span> &lt;span class="p">}&lt;/span>
+&lt;span class="ln">10&lt;/span> &lt;span class="p">]&lt;/span>
+&lt;span class="ln">11&lt;/span>&lt;span class="p">}&lt;/span>
+&lt;/code>&lt;/pre>&lt;/div>&lt;p>To get all phone numbers of John, the query for mongodb would be quite simple:&lt;/p>
+&lt;div class="highlight">&lt;pre class="chroma">&lt;code class="language-javascript" data-lang="javascript">&lt;span class="ln">1&lt;/span>&lt;span class="nx">db&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">users&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">find&lt;/span>&lt;span class="p">({&lt;/span>&lt;span class="s2">&amp;#34;name.first&amp;#34;&lt;/span>&lt;span class="o">:&lt;/span>&lt;span class="s2">&amp;#34;John&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>&lt;span class="s2">&amp;#34;name.last&amp;#34;&lt;/span>&lt;span class="o">:&lt;/span>&lt;span class="s2">&amp;#34;Doe&amp;#34;&lt;/span>&lt;span class="p">})&lt;/span>
+&lt;/code>&lt;/pre>&lt;/div>&lt;p>With an index set on the &lt;code>name&lt;/code> field, only the &lt;code>users&lt;/code> collection is involved and only one index has to be searched.&lt;/p>
+&lt;h4 id="the-power-of-embedding">The power of embedding&lt;/h4>
+&lt;p>We have seen that embedding wields quite some power when it comes to answering questions in an easy way. However, there are some drawbacks, which we will see in the next chapter.&lt;/p>
+&lt;h2 id="overembedding">Overembedding&lt;/h2>
+&lt;p>Actually, the &lt;a href="#embedded_chirps">&amp;quot;Chirper&amp;quot; example above&lt;/a> shows one of the major problems with embedding. Let's assume Chirper is The Next Big Thing, totally takes off and has millions of users chirping all day.&lt;/p>
+&lt;h3 id="the-document-size-problem">The document size problem&lt;/h3>
+&lt;p>With the data model above, Chirper is in big trouble now. Reason: as of the time of this writing &lt;a href="https://docs.mongodb.org/manual/reference/limits/#BSON-Document-Size" title="'BSON document size' in 'MongoDB Limits and Thresholds' – MongoDB documentation">the according MongoDB documentation states&lt;/a> that&lt;/p>
+&lt;blockquote>
+&lt;p>The maximum BSON document size is 16 megabytes.&lt;/p>
+&lt;p>The maximum document size helps ensure that a single document cannot use excessive amount of RAM or, during transmission, excessive amount of bandwidth.&lt;/p>
+&lt;/blockquote>
+&lt;p>Albeit 16 megabytes can hold a lot of &lt;code>follows&lt;/code> entries and &lt;code>chirps&lt;/code>, using the model shown above would artificially impose a limit on what a person can do just for the sake of comforting the developer. And we have not even started to think about answers, comments, votes, flags and alike.&lt;/p>
+&lt;h3 id="the-document-migration-problem">The document migration problem&lt;/h3>
+&lt;p>Note: This applies only for &lt;a href="https://docs.mongodb.org/manual/faq/storage/#mmapv1-storage-engine" title="'MMAPv1 Storage Engine' in 'FAQ: MongoDB Storage' – MongoDB documentation">the mmapv1 storage engine&lt;/a> of MongoDB. But since &lt;a href="https://docs.mongodb.org/manual/faq/storage/#what-will-be-the-default-storage-engine-going-forward" title="'What will be the default storage engine going forward?' in 'FAQ: MongoDB Storage' – MongoDB documentation">it is the default storage engine&lt;/a> as of the time of this writing, I am going to adress it.&lt;/p>
+&lt;p>MongoDB has a paradigm that documents are never fragmented, meaning that a document is always a contiguous stream of bytes in the datafiles.
+In order to prevent the need of migrating a document each time some bytes are added, MongoDB applies a padding to each document&lt;sup id="fnref:2">&lt;a href="#fn:2" class="footnote-ref" role="doc-noteref">2&lt;/a>&lt;/sup>, which is empty space which will be used when information is added to the document:&lt;/p>
+&lt;p>&lt;img src="https://blog.mahlberg.io/images/data-modelling-for-mongodb/padding.png" alt="MongoDB padding">&lt;/p>
+&lt;p>If this padding space is exhausted, the document will be migrated to a new place in the datafiles and new padding is allocated. This procedure is called &amp;quot;document migration&amp;quot; and it is a rather costly process – there is a reason why padding is added, the first place.&lt;/p>
+&lt;p>Now, when embedded data is constantly added to documents, this problem gets more severe, since a lot of document migrations might happen in parallel, which can -- and at some point will -- cause performance degration.&lt;/p>
+&lt;h3 id="the-problem-of-complicated-crud">The problem of complicated CRUD&lt;/h3>
+&lt;p>This problem coming with overembedding is a bit more subtle than the others. But it is rather easy to grasp when using deduction:&lt;/p>
+&lt;ol>
+&lt;li>The more complicated a model gets, the more complicated CRUD operations become.&lt;/li>
+&lt;li>The more complicated CRUD operations become, the harder code becomes to develop and maintain.&lt;/li>
+&lt;li>The harder code becomes to develop and maintain, the longer it needs.&lt;/li>
+&lt;li>The longer development and maintenance needs, the more expensive it gets, be it monetary or time-wise (or both).&lt;/li>
+&lt;li>All in all: The more complicated a model gets, the more expensive it gets, be it monetary or time-wise (or both).&lt;/li>
+&lt;/ol>
+&lt;p>One could argue that a complicated data model might pay off in the long term, but this is in fact bound to certain conditions (see below).&lt;/p>
+&lt;h2 id="conclusion">Conclusion&lt;/h2>
+&lt;p>I hope I was able to show the problems overembedding brings with it. To put it a bit more positive: Embedding works if…&lt;/p>
+&lt;ul>
+&lt;li>…we are talking of a One-To-(Very-)Few ™ relationship, otherwise we'll hit the BSON size limit &lt;em>AND&lt;/em>&lt;/li>
+&lt;li>…(updates are rather rare &lt;em>OR&lt;/em> you are using WiredTiger as a storage engine) &lt;em>AND&lt;/em>&lt;/li>
+&lt;li>…(embedding is kept rather simple and we are not talking of whole trees of subdocument arrays embedded &lt;em>OR&lt;/em> those complicated models are made necessary by requirements other then technical)&lt;/li>
+&lt;/ul>
+&lt;h2 id="outlook">Outlook&lt;/h2>
+&lt;p>In the next article of this series, I will show how to do the data modelling properly for a One-To-(Almost)-Infinite-Many relationship. Not only the actual data modelling itself, but how to approach it, since it is significantly different than the &amp;quot;SQL way&amp;quot;.&lt;/p>
+&lt;p>Please feel free to comment! I am eager to hear your opinion, corrections, questions (which I will try to answer) and suggestions. Also, the roadmap of this article series is not set in stone. If you want a specific matter to be discussed, do not hesitate to ask for it.&lt;/p>
+&lt;p>hth&lt;/p>
+&lt;section class="footnotes" role="doc-endnotes">
+&lt;hr>
+&lt;ol>
+&lt;li id="fn:1" role="doc-endnote">
+&lt;p>Yes, there are abstraction layers which can do this for you (as long as it does not get too complicated), and one could use (materialized) views, but that only puts the solving of those problems at another place or person – and possibly out of control. &lt;a href="#fnref:1" class="footnote-backref" role="doc-backlink">&amp;#x21a9;&amp;#xfe0e;&lt;/a>&lt;/p>
+&lt;/li>
+&lt;li id="fn:2" role="doc-endnote">
+&lt;p>Please see the &lt;a href="https://docs.mongodb.org/manual/core/mmapv1/#record-allocation-strategies" title="'Record Allocation Strategies' – MongoDB documentation">the MongoDB docs on 'Record Allocation Strategies'&lt;/a> for details &lt;a href="#fnref:2" class="footnote-backref" role="doc-backlink">&amp;#x21a9;&amp;#xfe0e;&lt;/a>&lt;/p>
+&lt;/li>
+&lt;/ol>
+&lt;/section></description></item></channel></rss>
