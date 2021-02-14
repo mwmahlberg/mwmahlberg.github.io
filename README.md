@@ -1,54 +1,23 @@
-# Jekyll Metro
+# hugoBasicExample
 
-Jekyll Metro is a metro inspired theme for [Jekyll](http://jekyllrb.com).
+This repository offers an example site for [Hugo](https://gohugo.io/) and also it provides the default content for demos hosted on the [Hugo Themes Showcase](https://themes.gohugo.io/).
 
-## Summary
+# Using
 
-Jekyll Metro is a theme built on top of bootstrap and other freely available libraries. Its aimed to provide a fully furnished Jekyll theme for personal sites with blog. 
+1. [Install Hugo](https://gohugo.io/overview/installing/)
+2. Clone this repository
+```bash
+git clone https://github.com/gohugoio/hugoBasicExample.git
+cd hugoBasicExample
+```
+3. Clone the repository you want to test. If you want to test all Hugo Themes then follow the instructions provided [here](https://github.com/gohugoio/hugoThemes#installing-all-themes)
+4. Run Hugo and select the theme of your choosing
+```bash
+hugo server -t YOURTHEME
+```
+5. Under `/content/` this repository contains the following:
+- A section called `/post/` with sample markdown content
+- A headless bundle called `homepage` that you may want to use for single page applications. You can find instructions about headless bundles over [here](https://gohugo.io/content-management/page-bundles/#headless-bundle)
+- An `about.md` that is intended to provide the `/about/` page for a theme demo
+6. If you intend to build a theme that does not fit in the content structure provided in this repository, then you are still more than welcome to submit it for review at the [Hugo Themes](https://github.com/gohugoio/hugoThemes/issues) respository
 
-## Version 1.0 Development (Beta 2 Released!)
-
-New features include:
-- Light box feature
-- Social media share widget
-- New colors
-
-Currently I am busy with other project and will devote less time in developing this theme forward. Updates and enhancements are welcome.
-
-
-## Features
-
-- Responsive Jekyll theme
-- Metro style Homepage
-  - Configurable tiles with different size
-  - Configurable colors for tiles
-  - Display of Latest and Recent articles as tiles
-- Pages for About Me, Resume with configurable color themes
-- Blog home page with listing of articles in pagination
-- Blog article page with configurable color themes
-- Easy integration with Google Analytics
-- Easy integration with Disqus for comments
-
-## Demo
-
-You can see the live demo of this theme at [http://blog-olakara.rhcloud.com](http://blog-olakara.rhcloud.com)
-
-## Author
-
-**[Abdel Raoof Olakara](http://abdelraoof.com)**
-
-
-## Contributors
-
-**Stilyan Kongalov**
-- <https://github.com/Stilyan-Kangalov>
-
-**Peter Zhu**
-- <https://github.com/ZhuFengdaaa>
-
-
-## License
-
-Open sourced under the [MIT license](LICENSE.md).
-
-<3
